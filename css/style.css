@@ -33,11 +33,25 @@ html, body{
     font-family: 'Poppins', sans-serif;
     border-radius: 10px;
     transition: background-color 0.5s;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.listHead{
+    display: inline-flex;
     justify-content: space-between;
 }
 
 .list i{
     cursor: pointer;
+}
+
+.item{
+    background-color: #FFFFFF;
+    padding: 5px;
+    margin: 5px;
+    border-radius: 3px;
+    font-size: 0.75em;
 }
 
 #add{
@@ -61,7 +75,11 @@ a{
     background-color: rgba(80, 80, 80, 0.35);
 }
 
+.add:hover{
+    text-decoration: none;
+    color: rgb(80, 80, 80);
+}
+
 a:visited{
     color: black;
 }
-

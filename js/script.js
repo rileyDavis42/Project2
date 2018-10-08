@@ -1,5 +1,9 @@
 let lists = [];
 
+let sheet = document.createElement('style');
+
+document.body.appendChild(sheet);
+
 (function () {
     let cookie = decodeURIComponent(document.cookie);
     if(cookie === 'color=red'){
@@ -13,6 +17,8 @@ let lists = [];
     }
     else{
         color('');
+        sheet.id = "sheet";
+        sheet.innerHTML = ".list{background-color: rgba(0, 0, 0, 0.35);}";
     }
 })
 ();
@@ -20,6 +26,10 @@ let lists = [];
 class List{
     constructor(name){
         this.name = name;
+        this.items = [];
+    }
+    add(name){
+        this.items.push(name);
     }
 }
 
@@ -34,13 +44,13 @@ function add(){
             return;
         }
     }
-    lists.push(new List(name));
 
     //Creating the div
     let listsDiv = document.getElementById('lists');
     let node = document.createElement('div');
     let listClass = document.createAttribute('class');
     let listID = document.createAttribute('id');
+    let listHead = document.createElement('div');
 
     //Creating the name
     let title = document.createElement('h5');
@@ -51,7 +61,7 @@ function add(){
     listID.value = "list_" + name;
     node.setAttributeNode(listClass);
     node.setAttributeNode(listID);
-    node.appendChild(title);
+    listHead.appendChild(title);
 
     //Trash bin on the div
     let trash = document.createElement('i');
@@ -61,9 +71,33 @@ function add(){
     del.value = "delet(\'list_" + name + "\')";
     trash.setAttributeNode(icon);
     trash.setAttributeNode(del);
-    node.appendChild(trash);
+    listHead.appendChild(trash);
 
+    //Adding items
+    let items = document.createElement('div');
+    items.className = "item";
+    items.innerHTML = "<a href=\"javascript:addItem('" + listID.value + "')\" class='add'>Add item</a>";
+
+    //Handling Head
+    let listHeadClass = document.createAttribute('class');
+    listHeadClass.value = "listHead";
+    listHead.setAttributeNode(listHeadClass);
+
+    //Creation
+    lists.push(new List(listID.value));
+    node.appendChild(listHead);
+    node.appendChild(items);
     listsDiv.appendChild(node);
+}
+
+function addItem(id){
+    let name = prompt("What is the item titled?");
+    for(let i = 0; i < lists.length; i++){
+        if(lists[i].name === id){
+            lists[i].add(name);
+        }
+    }
+    updateList(id);
 }
 
 function delet(id){
@@ -76,18 +110,39 @@ function delet(id){
 function color(color){
     if(color === 'red'){
         document.body.style.backgroundColor = "red";
+        sheet.innerHTML = "body{color: #FFFFFF} .listHead, .item{color: #000000}";
         document.cookie = "color=red; expires=Fri, 21 Dec 2018 12:00:00 UTC; path=/";
     }
     else if(color === 'green'){
         document.body.style.backgroundColor = "#2ECC71";
+        sheet.innerHTML = "body{color: #FFFFFF} .listHead, .item{color: #000000}";
         document.cookie = "color=green; expires=Fri, 21 Dec 2018 12:00:00 UTC; path=/";
     }
     else if(color === 'blue'){
         document.body.style.backgroundColor = "deepskyblue";
+        sheet.innerHTML = "body{color: #FFFFFF} .listHead, .item{color: #000000}";
         document.cookie = "color=blue; expires=Fri, 21 Dec 2018 12:00:00 UTC; path=/";
     }
     else{
         document.body.style.backgroundColor = "#FFFFFF";
+        sheet.innerHTML = ".list{background-color: rgba(0, 0, 0, 0.35);}";
         document.cookie = "color=white; expires=Fri, 21 Dec 2018 12:00:00 UTC; path=/";
+    }
+}
+
+function updateList(id){
+    let list = new List();
+    for(let i = 0; i < lists.length; i++){
+        if(lists[i].name === id){
+            list = lists[i];
+        }
+    }
+    for(let i = 0; i < list.items.length; i++){
+        let node = document.createElement('div');
+        let nodeClass = document.createAttribute('class');
+        nodeClass.value = 'item';
+        node.setAttributeNode(nodeClass);
+        node.innerHTML = list.items[i];
+        document.getElementById(id).appendChild(node);
     }
 }
