@@ -46,12 +46,17 @@ html, body{
     cursor: pointer;
 }
 
-.item{
+.item, .itemAdd{
     background-color: #FFFFFF;
     padding: 5px;
     margin: 5px;
     border-radius: 3px;
     font-size: 0.75em;
+}
+
+.checkBox{
+    width: 25px; height: 25px;
+    border: 1px solid black;
 }
 
 #add{

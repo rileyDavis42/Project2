@@ -75,7 +75,7 @@ function add(){
 
     //Adding items
     let items = document.createElement('div');
-    items.className = "item";
+    items.className = "itemAdd";
     items.innerHTML = "<a href=\"javascript:addItem('" + listID.value + "')\" class='add'>Add item</a>";
 
     //Handling Head
@@ -92,12 +92,17 @@ function add(){
 
 function addItem(id){
     let name = prompt("What is the item titled?");
-    for(let i = 0; i < lists.length; i++){
-        if(lists[i].name === id){
-            lists[i].add(name);
+    if(name.length > 0){
+        for(let i = 0; i < lists.length; i++){
+            if(lists[i].name === id){
+                lists[i].add(name);
+            }
         }
+        updateList(id);
     }
-    updateList(id);
+    else{
+        alert("Name too short!");
+    }
 }
 
 function delet(id){
@@ -131,18 +136,40 @@ function color(color){
 }
 
 function updateList(id){
+    //Gets list
     let list = new List();
     for(let i = 0; i < lists.length; i++){
         if(lists[i].name === id){
             list = lists[i];
         }
     }
+
+    //Deleting all items
+    let docList = document.getElementById(id);
+    let resetHead = docList.getElementsByClassName("listgiHead")[0];
+    let resetAdd = docList.getElementsByClassName("itemAdd")[0];
+    docList.innerHTML = "";
+    docList.appendChild(resetHead);
+    docList.appendChild(resetAdd);
+
+    //Adding all items
     for(let i = 0; i < list.items.length; i++){
         let node = document.createElement('div');
         let nodeClass = document.createAttribute('class');
+
+        /*Check Box
+        let checkBox = document.createElement('a');
+        let checkBoxClass = document.createAttribute('class');
+        let checkBoxHref = document.createAttribute('href');
+        checkBoxClass.value = "check";
+        checkBoxHref.value = "javascript:check()";
+        checkBox.appendChild(checkBoxClass);
+        checkBox.appendChild(checkBoxHref);*/
+
         nodeClass.value = 'item';
         node.setAttributeNode(nodeClass);
         node.innerHTML = list.items[i];
-        document.getElementById(id).appendChild(node);
+        //node.appendChild(checkBox);
+        docList.appendChild(node);
     }
 }
