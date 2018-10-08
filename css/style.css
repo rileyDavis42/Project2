@@ -1,9 +1,22 @@
 html, body{
-    background-color: deepskyblue;
+    overflow: unset;
 }
 
 #nav{
+    display: flex;
+    justify-content: space-between;
+}
 
+#colorPalette{
+    border-radius: 20px;
+    display: flex;
+}
+
+.color{
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    margin: 5px;
 }
 
 #lists{
@@ -14,7 +27,7 @@ html, body{
     background-color: rgba(255, 255, 255, 0.85);
     display: inline-flex;
     width: 20vw;
-    margin: 0;
+    margin: 5px;
     padding: 10px;
     font-size: 1.25em;
     font-family: 'Poppins', sans-serif;
@@ -51,3 +64,4 @@ a{
 a:visited{
     color: black;
 }
+
