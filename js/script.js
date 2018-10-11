@@ -39,8 +39,9 @@ function add(){
         return;
     }
     for(let i = 0; i < lists.length; i++){
-        if(name === lists[i].name){
-            alert("That name already exists!");
+        console.log(lists[i].name);
+        if('list_' + name === lists[i].name){
+            alert("That list already exists!");
             return;
         }
     }
@@ -62,6 +63,9 @@ function add(){
     node.setAttributeNode(listClass);
     node.setAttributeNode(listID);
     listHead.appendChild(title);
+
+    //Clear Completed
+    //<i class="fas fa-check-double"></i>
 
     //Trash bin on the div
     let trash = document.createElement('i');
@@ -91,7 +95,7 @@ function add(){
 }
 
 function addItem(id){
-    let name = prompt("What is the item titled?");
+    let name = prompt("What is the name of the item?");
     if(name.length > 0){
         for(let i = 0; i < lists.length; i++){
             if(lists[i].name === id){
@@ -100,15 +104,17 @@ function addItem(id){
         }
         updateList(id);
     }
-    else{
-        alert("Name too short!");
-    }
 }
 
 function delet(id){
     if(confirm("Are you sure?")){
         let element = document.getElementById(id);
         element.parentNode.removeChild(element);
+        for(let i = 0; i < lists.length; i++){
+            if(lists[i].name === id){
+                lists.splice(i, 1);
+            }
+        }
     }
 }
 
@@ -146,7 +152,7 @@ function updateList(id){
 
     //Deleting all items
     let docList = document.getElementById(id);
-    let resetHead = docList.getElementsByClassName("listgiHead")[0];
+    let resetHead = docList.getElementsByClassName("listHead")[0];
     let resetAdd = docList.getElementsByClassName("itemAdd")[0];
     docList.innerHTML = "";
     docList.appendChild(resetHead);
@@ -157,19 +163,37 @@ function updateList(id){
         let node = document.createElement('div');
         let nodeClass = document.createAttribute('class');
 
-        /*Check Box
+        //Check Box
         let checkBox = document.createElement('a');
         let checkBoxClass = document.createAttribute('class');
         let checkBoxHref = document.createAttribute('href');
+        let checkBoxId = document.createAttribute('id');
         checkBoxClass.value = "check";
-        checkBoxHref.value = "javascript:check()";
-        checkBox.appendChild(checkBoxClass);
-        checkBox.appendChild(checkBoxHref);*/
+        checkBoxId.value = id + "_" + list.items[i];
+        checkBoxHref.value = "javascript:check('" + checkBoxId.value + "')";
+        checkBox.setAttributeNode(checkBoxClass);
+        checkBox.setAttributeNode(checkBoxHref);
+        checkBox.setAttributeNode(checkBoxId);
 
         nodeClass.value = 'item';
         node.setAttributeNode(nodeClass);
         node.innerHTML = list.items[i];
-        //node.appendChild(checkBox);
+        node.appendChild(checkBox);
         docList.appendChild(node);
+    }
+}
+
+function check(id){
+    let obj = document.getElementById(id);
+    let parent = obj.parentNode;
+    if(parent.style.textDecoration === "line-through"){
+        parent.style.backgroundColor = "#FFFFFF";
+        obj.innerHTML = "";
+        parent.style.textDecoration = "none";
+    }
+    else{
+        obj.innerHTML = '<i class=\"fas fa-check\"></i>';
+        parent.style.textDecoration = "line-through";
+        parent.style.backgroundColor = "#8AF7B8";
     }
 }

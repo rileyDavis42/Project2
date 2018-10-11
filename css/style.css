@@ -50,19 +50,24 @@ html, body{
     background-color: #FFFFFF;
     padding: 5px;
     margin: 5px;
+    display: flex;
+    transition: background-color 1s;
+    justify-content: space-between;
     border-radius: 3px;
     font-size: 0.75em;
 }
 
-.checkBox{
+.check{
     width: 25px; height: 25px;
     border: 1px solid black;
+    border-radius: 5px;
 }
 
 #add{
     background-color: rgba(0, 0, 0, 0.35);
     display: inline-block;
     width: 20vw;
+    margin: 5px;
     padding: 10px;
     font-size: 1.25em;
     font-family: 'Poppins', sans-serif;
