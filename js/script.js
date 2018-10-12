@@ -9,22 +9,22 @@ class List{
 }
 
 let lists = [];
-let expirationDate = "Fri, 21 Dec 2018 12:00:00 UTC";
+//let expirationDate = "Fri, 21 Dec 2018 12:00:00 UTC";
 
 let sheet = document.createElement('style');
 
 document.body.appendChild(sheet);
 
 (function () {
-    let cookie = decodeURIComponent(document.cookie);
-    let cookieArr = cookie.split(';');
-    if(cookieArr[0] === 'color=red'){
+    //let cookie = localStorage.getItem('list');
+    let colorCookie = localStorage.getItem('color');
+    if(colorCookie === 'red'){
         color('red');
     }
-    else if(cookieArr[0] === 'color=green'){
+    else if(colorCookie === 'green'){
         color('green');
     }
-    else if(cookieArr[0] === 'color=blue'){
+    else if(colorCookie === 'blue'){
         color('blue');
     }
     else{
@@ -32,11 +32,11 @@ document.body.appendChild(sheet);
         sheet.id = "sheet";
         sheet.innerHTML = ".list{background-color: rgba(0, 0, 0, 0.35);}";
     }
-    upload(cookieArr);
+    upload(1);
 })
 ();
 
-function add(name){
+function createList(name){
     if(name.length < 1){
         return;
     }
@@ -46,6 +46,12 @@ function add(name){
             return;
         }
     }
+    lists.push(new List('list_' + name));
+    localStorage.setItem('list' + lists.length, 'list_' + name);
+    add(name);
+}
+
+function add(name){
 
     //Creating the div
     let listsDiv = document.getElementById('lists');
@@ -89,11 +95,10 @@ function add(name){
     listHead.setAttributeNode(listHeadClass);
 
     //Creation
-    lists.push(new List(listID.value));
     node.appendChild(listHead);
     node.appendChild(items);
     listsDiv.appendChild(node);
-    download();
+    //download();
 }
 
 function addItem(id, name){
@@ -109,7 +114,7 @@ function addItem(id, name){
 
 function delet(id){
     if(confirm("Are you sure?")){
-        document.cookie = id + "=na; expires=Mon, 1 Oct 2018 00:00:00 UTC; path=/";
+        //document.cookie = id + "=na; expires=Mon, 1 Oct 2018 00:00:00 UTC; path=/";
         let element = document.getElementById(id);
         element.parentNode.removeChild(element);
         for(let i = 0; i < lists.length; i++){
@@ -117,14 +122,23 @@ function delet(id){
                 lists.splice(i, 1);
             }
         }
-        let cookie = decodeURIComponent(document.cookie);
+
+        let items = Object.keys(localStorage);
+        for(let i = 0; i < items.length; i++){
+            if(localStorage.getItem(items[i]) === id){
+                localStorage.removeItem(items[i]);
+            }
+        }
+
+        /*let cookie = decodeURIComponent(document.cookie);
         let cookieArr = cookie.split(';');
         for(let i = 0; i < cookieArr.length; i++){
             if(cookieArr[i].substr(1, id.length) === id){
                 let krana = cookieArr[i].split('=');
                 document.cookie = krana[0] + '=na; expires=Mon, 1 oct 2018 00:00:00 UTC; path=/';
             }
-        }
+        }*/
+        //download();
     }
 }
 
@@ -132,22 +146,22 @@ function color(color){
     if(color === 'red'){
         document.body.style.backgroundColor = "red";
         sheet.innerHTML = "body{color: #FFFFFF} .listHead, .item{color: #000000}";
-        document.cookie = "color=red; expires=" + expirationDate + "path=/colors/;";
+        localStorage.setItem('color', 'red')
     }
     else if(color === 'green'){
         document.body.style.backgroundColor = "#2ECC71";
         sheet.innerHTML = "body{color: #FFFFFF} .listHead, .item{color: #000000}";
-        document.cookie = "color=green; expires=" + expirationDate + "path=/colors/;";
+        localStorage.setItem('color', 'green')
     }
     else if(color === 'blue'){
         document.body.style.backgroundColor = "deepskyblue";
         sheet.innerHTML = "body{color: #FFFFFF} .listHead, .item{color: #000000}";
-        document.cookie = "color=blue; expires=" + expirationDate + "path=/colors/;";
+        localStorage.setItem('color', 'blue');
     }
     else{
         document.body.style.backgroundColor = "#FFFFFF";
         sheet.innerHTML = ".list{background-color: rgba(0, 0, 0, 0.35);}";
-        document.cookie = "color=white; expires=" + expirationDate + "path=/colors/;";
+        localStorage.setItem('color', 'white');
     }
 }
 
@@ -191,7 +205,7 @@ function updateList(id){
         node.appendChild(checkBox);
         docList.appendChild(node);
     }
-    download();
+    //download();
 }
 
 function check(id){
@@ -209,10 +223,17 @@ function check(id){
     }
 }
 
-function upload(cookie){
-    for(let i = 0; i < cookie.length; i++){
+function upload(num){
+    if(localStorage.getItem('list' + num)){
+        let list = new List(localStorage.getItem('list' + num));
+        lists.push(list);
+        add(getListName(list.name));
+        num++;
+        upload(num);
+    }
+    /*for(let i = 0; i < cookie.length; i++){
         if(cookie[i].substr(cookie[i].length - 2, cookie[i].length) !== 'na') {
-            if (cookie[i].substr(cookie[i].length - 4, cookie[i].length) === 'item') {
+            if (cookie[i].substr(cookie[i].length - 4, cookie[i].length) === 'true' || cookie[i].substr(cookie[i].length - 4, cookie[i].length) === 'false') {
                 let item = cookie[i].split(' ');
                 item[2] = item[2].substr(0, item[2].length - 5);
                 addItem(item[1], item[2])
@@ -223,16 +244,23 @@ function upload(cookie){
                 add(krana[0]);
             }
         }
-    }
+    }*/
 }
 
 function download(){
     for(let i = 0; i < lists.length; i++){
+        localStorage.setItem('list' + i, lists[i].name);
+    }
+    /*for(let i = 0; i < lists.length; i++){
         let thisList = lists[i];
         document.cookie = thisList.name + "=list" + "; expires=" + expirationDate + "; path=/";
         for(let j = 0; j < thisList.items.length; j++){
             let name = thisList.name + ' ' + thisList.items[i];
             document.cookie = name + "=item" + "; expires=" + expirationDate + "; path=/";
         }
-    }
+    }*/
+}
+
+function getListName(list){
+    return list.substr(5, list.length);
 }
