@@ -1,3 +1,7 @@
+// Need to do...
+// -add functionality to save list items to local storage
+// -can edit names of the lists/items
+
 class List{
     constructor(name){
         this.name = name;
@@ -9,14 +13,13 @@ class List{
 }
 
 let lists = [];
-//let expirationDate = "Fri, 21 Dec 2018 12:00:00 UTC";
 
 let sheet = document.createElement('style');
 
 document.body.appendChild(sheet);
 
+//This starting function will find out the color of the website, then calls upload() to add all the lists from local storage
 (function () {
-    //let cookie = localStorage.getItem('list');
     let colorCookie = localStorage.getItem('color');
     if(colorCookie === 'red'){
         color('red');
@@ -36,6 +39,7 @@ document.body.appendChild(sheet);
 })
 ();
 
+//Used for creating a new list, checks to make sure the list doesn't already exist and adds it to local storage if not
 function createList(name){
     if(name.length < 1){
         return;
@@ -51,6 +55,7 @@ function createList(name){
     add(name);
 }
 
+//Used for making a list in HTML, does not interact with local storage
 function add(name){
 
     //Creating the div
@@ -98,9 +103,9 @@ function add(name){
     node.appendChild(listHead);
     node.appendChild(items);
     listsDiv.appendChild(node);
-    //download();
 }
 
+//Adds an item to a list, and updates the list afterwards
 function addItem(id, name){
     if(name.length > 0){
         for(let i = 0; i < lists.length; i++){
@@ -112,9 +117,9 @@ function addItem(id, name){
     }
 }
 
+//Deletes an entire list, both from the page and from the local storage
 function delet(id){
     if(confirm("Are you sure?")){
-        //document.cookie = id + "=na; expires=Mon, 1 Oct 2018 00:00:00 UTC; path=/";
         let element = document.getElementById(id);
         element.parentNode.removeChild(element);
         for(let i = 0; i < lists.length; i++){
@@ -129,19 +134,10 @@ function delet(id){
                 localStorage.removeItem(items[i]);
             }
         }
-
-        /*let cookie = decodeURIComponent(document.cookie);
-        let cookieArr = cookie.split(';');
-        for(let i = 0; i < cookieArr.length; i++){
-            if(cookieArr[i].substr(1, id.length) === id){
-                let krana = cookieArr[i].split('=');
-                document.cookie = krana[0] + '=na; expires=Mon, 1 oct 2018 00:00:00 UTC; path=/';
-            }
-        }*/
-        //download();
     }
 }
 
+//Changes the color scheme of the page
 function color(color){
     if(color === 'red'){
         document.body.style.backgroundColor = "red";
@@ -165,6 +161,7 @@ function color(color){
     }
 }
 
+//Updates a list with all of it's items
 function updateList(id){
     //Gets list
     let list = new List();
@@ -205,9 +202,9 @@ function updateList(id){
         node.appendChild(checkBox);
         docList.appendChild(node);
     }
-    //download();
 }
 
+//Function for checking and unchecking boxes on items
 function check(id){
     let obj = document.getElementById(id);
     let parent = obj.parentNode;
@@ -223,6 +220,7 @@ function check(id){
     }
 }
 
+//Gets local storage data and converts it into lists
 function upload(num){
     if(localStorage.getItem('list' + num)){
         let list = new List(localStorage.getItem('list' + num));
@@ -231,36 +229,16 @@ function upload(num){
         num++;
         upload(num);
     }
-    /*for(let i = 0; i < cookie.length; i++){
-        if(cookie[i].substr(cookie[i].length - 2, cookie[i].length) !== 'na') {
-            if (cookie[i].substr(cookie[i].length - 4, cookie[i].length) === 'true' || cookie[i].substr(cookie[i].length - 4, cookie[i].length) === 'false') {
-                let item = cookie[i].split(' ');
-                item[2] = item[2].substr(0, item[2].length - 5);
-                addItem(item[1], item[2])
-            }
-            else if (cookie[i].substr(1, 5) === 'list_') {
-                let krana = cookie[i].substr(6, cookie[i].length);
-                krana = krana.split('=');
-                add(krana[0]);
-            }
-        }
-    }*/
 }
 
+//Ideally saves all data on lists to the local storage
 function download(){
     for(let i = 0; i < lists.length; i++){
         localStorage.setItem('list' + i, lists[i].name);
     }
-    /*for(let i = 0; i < lists.length; i++){
-        let thisList = lists[i];
-        document.cookie = thisList.name + "=list" + "; expires=" + expirationDate + "; path=/";
-        for(let j = 0; j < thisList.items.length; j++){
-            let name = thisList.name + ' ' + thisList.items[i];
-            document.cookie = name + "=item" + "; expires=" + expirationDate + "; path=/";
-        }
-    }*/
 }
 
+//Returns the name of a list without the 'list_' at the beginning
 function getListName(list){
     return list.substr(5, list.length);
 }
