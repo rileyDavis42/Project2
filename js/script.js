@@ -59,7 +59,16 @@ function createList(name){
 function add(name){
 
     //Creating the div
-    let listsDiv = document.getElementById('lists');
+    $('#lists').append(
+        "<div class='list' id='list_" + name + "'>" +
+        "<div class='listHead'>" +
+        "<h5>" + name + "</h5>" +
+        "<i class=\"fas fa-trash alt\" onclick=\"delet('list_" + name + "')\"></i>" +
+        "</div> " +
+        "<div class='itemAdd'><a href=\"javascript:addItem('list_" + name + "', prompt(\'What would you like to name the item?\'))\" class='add'>Add item</a></div>" +
+        " </div>"
+        );
+    /*let listsDiv = document.getElementById('lists');
     let node = document.createElement('div');
     let listClass = document.createAttribute('class');
     let listID = document.createAttribute('id');
@@ -102,7 +111,8 @@ function add(name){
     //Creation
     node.appendChild(listHead);
     node.appendChild(items);
-    listsDiv.appendChild(node);
+    //listsDiv.appendChild(node);
+    */
 }
 
 //Adds an item to a list, and updates the list afterwards
