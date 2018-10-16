@@ -1,6 +1,6 @@
 // Need to do...
-// -add functionality to save list items to local storage
-// -can edit names of the lists/items
+// -Fix issues with spaces in name and trying to edit.
+// -Enable feature to remove completed items.
 
 class List{
     constructor(name){
@@ -35,12 +35,13 @@ document.body.appendChild(sheet);
         sheet.id = "sheet";
         sheet.innerHTML = ".list{background-color: rgba(0, 0, 0, 0.35);}";
     }
-    upload(1);
+    upload();
 })
 ();
 
 //Used for creating a new list, checks to make sure the list doesn't already exist and adds it to local storage if not
 function createList(name){
+    name = name.replace(/[^a-zA-Z ]/g, "");
     if(name.length < 1){
         return;
     }
@@ -51,68 +52,23 @@ function createList(name){
         }
     }
     lists.push(new List('list_' + name));
-    localStorage.setItem('list' + lists.length, 'list_' + name);
+    download();
+    //localStorage.setItem('list' + lists.length, 'list_' + name);
     add(name);
 }
 
 //Used for making a list in HTML, does not interact with local storage
 function add(name){
-
     //Creating the div
     $('#lists').append(
         "<div class='list' id='list_" + name + "'>" +
         "<div class='listHead'>" +
-        "<h5>" + name + "</h5>" +
+        "<h5 contenteditable='true' onkeydown=\"editList('" + name + "')\">" + name + "</h5>" +
         "<i class=\"fas fa-trash alt\" onclick=\"delet('list_" + name + "')\"></i>" +
         "</div> " +
         "<div class='itemAdd'><a href=\"javascript:addItem('list_" + name + "', prompt(\'What would you like to name the item?\'))\" class='add'>Add item</a></div>" +
         " </div>"
         );
-    /*let listsDiv = document.getElementById('lists');
-    let node = document.createElement('div');
-    let listClass = document.createAttribute('class');
-    let listID = document.createAttribute('id');
-    let listHead = document.createElement('div');
-
-    //Creating the name
-    let title = document.createElement('h5');
-    title.innerHTML = name;
-
-    //adding the attributes and name
-    listClass.value = "list";
-    listID.value = "list_" + name;
-    node.setAttributeNode(listClass);
-    node.setAttributeNode(listID);
-    listHead.appendChild(title);
-
-    //Clear Completed
-    //<i class="fas fa-check-double"></i>
-
-    //Trash bin on the div
-    let trash = document.createElement('i');
-    let icon = document.createAttribute('class');
-    icon.value = "fas fa-trash alt";
-    let del = document.createAttribute('onclick');
-    del.value = "delet(\'list_" + name + "\')";
-    trash.setAttributeNode(icon);
-    trash.setAttributeNode(del);
-    listHead.appendChild(trash);
-
-    //Adding items
-    let items = document.createElement('div');
-    items.className = "itemAdd";
-    items.innerHTML = "<a href=\"javascript:addItem('" + listID.value + "', prompt(\'What would you like to name the item?\'))\" class='add'>Add item</a>";
-
-    //Handling Head
-    let listHeadClass = document.createAttribute('class');
-    listHeadClass.value = "listHead";
-    listHead.setAttributeNode(listHeadClass);
-
-    //Creation
-    node.appendChild(listHead);
-    node.appendChild(items);
-    //listsDiv.appendChild(node);
-    */
 }
 
 //Adds an item to a list, and updates the list afterwards
@@ -124,6 +80,7 @@ function addItem(id, name){
             }
         }
         updateList(id);
+        download();
     }
 }
 
@@ -137,14 +94,34 @@ function delet(id){
                 lists.splice(i, 1);
             }
         }
+        download();
+    }
+}
 
-        let items = Object.keys(localStorage);
-        for(let i = 0; i < items.length; i++){
-            if(localStorage.getItem(items[i]) === id){
-                localStorage.removeItem(items[i]);
+function editList(id){
+    id = id.replace(/nbsp/g, ' ');
+    console.log(id);
+    setTimeout(function(){
+        let list = getFullName(id);
+        let listObj = $('#' + list);
+        let obj = listObj.find('h5');
+        let trash = listObj.find('i');
+        let txt = obj.html();
+        txt = txt.replace(/[^a-zA-Z ]/g, "");
+        txt = txt.replace(/nbsp/g, ' ');
+        let parent = obj.parent();
+        parent = parent.parent();
+        parent.attr('id', getFullName(txt));
+        obj.attr('onkeydown', "editList(\'" + txt + "\')");
+        trash.attr('onclick', "delet('" + txt + "')");
+        for(let i = 0; i < lists.length; i++){
+            if(lists[i].name === list){
+                lists[i].name = getFullName(txt);
             }
         }
-    }
+
+        download();
+    } , 100);
 }
 
 //Changes the color scheme of the page
@@ -231,24 +208,34 @@ function check(id){
 }
 
 //Gets local storage data and converts it into lists
-function upload(num){
-    if(localStorage.getItem('list' + num)){
-        let list = new List(localStorage.getItem('list' + num));
-        lists.push(list);
-        add(getListName(list.name));
-        num++;
-        upload(num);
+function upload(){
+    if(localStorage.getItem("lists")){
+        let newLists = JSON.parse(localStorage.getItem("lists"));
+        for(let i = 0; i < newLists.length; i++){
+            let list = new List(newLists[i].name);
+            for(let j = 0; j < newLists[i].items.length; j++){
+                list.add(newLists[i].items[j]);
+            }
+            lists.push(list);
+            add(getListName(list.name));
+            if(list.items.length > 0){
+                updateList(list.name);
+            }
+        }
     }
 }
 
 //Ideally saves all data on lists to the local storage
 function download(){
-    for(let i = 0; i < lists.length; i++){
-        localStorage.setItem('list' + i, lists[i].name);
-    }
+    localStorage.setItem("lists", JSON.stringify(lists))
 }
 
 //Returns the name of a list without the 'list_' at the beginning
 function getListName(list){
     return list.substr(5, list.length);
+}
+
+//Returns the passed in string but with 'list_' at the beginning, for html finding purposes.
+function getFullName(list){
+    return "list_" + list;
 }
