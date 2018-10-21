@@ -7,9 +7,10 @@ html, body{
     justify-content: space-between;
 }
 
-#colorPalette{
+#side{
     border-radius: 20px;
     display: flex;
+    transition: width 1s;
 }
 
 .color{
@@ -99,4 +100,42 @@ a{
 
 a:visited{
     color: black;
+}
+
+#mopen{
+    display: none;
+}
+
+@media only screen and (max-width: 1000px) {
+    .listHead h5{
+        font-size: 3em;
+
+    }
+    .list{
+        display: flex;
+        font-size: 3em;
+        width: 100%;
+        margin: 20px;
+    }
+    #mopen{
+        display: flex;
+        background-color: #FFFFFF;
+        border: none;
+        font-size: 70px;
+        text-align: right;
+    }
+    #side{
+        height: 100%;
+        width: 0;
+        overflow: hidden;
+        background-color: #FFFFFF;
+        border-radius: 0;
+    }
+    #add{
+        display: block;
+        width: 100%;
+    }
+    #add div h5{
+        font-size: 4em;
+    }
 }

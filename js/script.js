@@ -50,6 +50,16 @@ document.body.appendChild(sheet);
 })
 ();
 
+function openNav(){
+    if(document.getElementById('side').style.width === "250px"){
+        document.getElementById('side').style.width = "0";
+    }
+    else{
+        document.getElementById('side').style.width = "250px";
+    }
+
+}
+
 //Used for creating a new list, checks to make sure the list doesn't already exist and adds it to local storage if not
 function createList(name){
     name = name.replace(/[^a-zA-Z ]/g, "");
@@ -104,6 +114,18 @@ function delet(id){
                 lists.splice(i, 1);
             }
         }
+        download();
+    }
+}
+
+
+function deletItem(listName, itemName){
+    if(confirm("Are you sure you want to delete item '" + itemName + "'?")){
+        let index = getList(listName);
+        let list = lists[index];
+        //let item = list.items[getItem(list, itemName)];
+        lists[index].items.splice(getItem(list, itemName), 1);
+        updateList(listName);
         download();
     }
 }
@@ -223,17 +245,6 @@ function updateList(id){
         docList.appendChild(node);
         check(id, checkBoxId.value);
         check(id, checkBoxId.value);
-    }
-}
-
-function deletItem(listName, itemName){
-    if(confirm("Are you sure you want to delete item '" + itemName + "'?")){
-        let index = getList(listName);
-        let list = lists[index];
-        //let item = list.items[getItem(list, itemName)];
-        lists[index].items.splice(getItem(list, itemName), 1);
-        updateList(listName);
-        download();
     }
 }
 
