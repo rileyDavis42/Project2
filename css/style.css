@@ -57,6 +57,13 @@ html, body{
     font-size: 0.75em;
 }
 
+.interact{
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: space-around;
+}
+
 .check{
     width: 25px; height: 25px;
     border: 1px solid black;

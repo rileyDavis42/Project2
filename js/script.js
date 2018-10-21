@@ -2,13 +2,24 @@
 // -Fix issues with spaces in name and trying to edit.
 // -Enable feature to remove completed items.
 
+class Item{
+    constructor(name, done){
+        this.name = name;
+        this.done = done;
+    }
+    mark(){
+        this.done = !this.done;
+    }
+}
+
 class List{
     constructor(name){
         this.name = name;
         this.items = [];
     }
-    add(name){
-        this.items.push(name);
+    add(name, done){
+        let item = new Item(name, done);
+        this.items.push(item);
     }
 }
 
@@ -53,7 +64,6 @@ function createList(name){
     }
     lists.push(new List('list_' + name));
     download();
-    //localStorage.setItem('list' + lists.length, 'list_' + name);
     add(name);
 }
 
@@ -76,7 +86,7 @@ function addItem(id, name){
     if(name.length > 0){
         for(let i = 0; i < lists.length; i++){
             if(lists[i].name === id){
-                lists[i].add(name);
+                lists[i].add(name, false);
             }
         }
         updateList(id);
@@ -171,40 +181,92 @@ function updateList(id){
         let node = document.createElement('div');
         let nodeClass = document.createAttribute('class');
 
+        //Div for trash and check box
+        let interact = document.createElement('div');
+        let interactClass = document.createAttribute('class');
+        interactClass.value = "interact";
+        interact.setAttributeNode(interactClass);
+
+        //Trash
+        let trash = document.createElement('i');
+        let trashClass = document.createAttribute('class');
+        let trashHref = document.createAttribute('onclick');
+        trashClass.value = "fas fa-trash alt";
+        trashHref.value = "deletItem('" + list.name + "', '" + list.items[i].name + "')";
+        trash.setAttributeNode(trashClass);
+        trash.setAttributeNode(trashHref);
+        //let trash = $("<i class = \"fas fa-trash alt\" href=\"javascript:deletItem('list_" + list.name + ", " + list.items[i].name + "')></i>");
+
         //Check Box
         let checkBox = document.createElement('a');
         let checkBoxClass = document.createAttribute('class');
         let checkBoxHref = document.createAttribute('href');
         let checkBoxId = document.createAttribute('id');
         checkBoxClass.value = "check";
-        checkBoxId.value = id + "_" + list.items[i];
-        checkBoxHref.value = "javascript:check('" + checkBoxId.value + "')";
+        checkBoxId.value = id + "_" + list.items[i].name;
+        checkBoxHref.value = "javascript:check('" + id + '\',\'' + checkBoxId.value + "')";
         checkBox.setAttributeNode(checkBoxClass);
         checkBox.setAttributeNode(checkBoxHref);
         checkBox.setAttributeNode(checkBoxId);
 
+        //Text
+        let txt = document.createElement('span');
+        txt.innerHTML = list.items[i].name;
+
+        //Final Stuff
         nodeClass.value = 'item';
         node.setAttributeNode(nodeClass);
-        node.innerHTML = list.items[i];
-        node.appendChild(checkBox);
+        node.appendChild(txt);
+        interact.appendChild(trash);
+        interact.appendChild(checkBox);
+        node.appendChild(interact);
         docList.appendChild(node);
+        check(id, checkBoxId.value);
+        check(id, checkBoxId.value);
+    }
+}
+
+function deletItem(listName, itemName){
+    if(confirm("Are you sure you want to delete item '" + itemName + "'?")){
+        let index = getList(listName);
+        let list = lists[index];
+        //let item = list.items[getItem(list, itemName)];
+        lists[index].items.splice(getItem(list, itemName), 1);
+        updateList(listName);
+        download();
     }
 }
 
 //Function for checking and unchecking boxes on items
-function check(id){
-    let obj = document.getElementById(id);
-    let parent = obj.parentNode;
-    if(parent.style.textDecoration === "line-through"){
+function check(listID, itemID){
+    let obj = document.getElementById(itemID);
+    let txt = $(obj).parent().parent();
+    let span = txt.find('span').html();
+    let list;
+    let index = 0;
+    for(let i = 0; i < lists.length; i++){
+        if(lists[i].name === listID)
+            list = lists[i];
+    }
+    for (let i = 0; i < list.items.length; i++){
+        if(list.items[i].name === span){
+            index = i;
+        }
+    }
+    let parent = obj.parentNode.parentNode;
+    if(list.items[index].done){
         parent.style.backgroundColor = "#FFFFFF";
         obj.innerHTML = "";
         parent.style.textDecoration = "none";
+        list.items[index].done = false;
     }
     else{
         obj.innerHTML = '<i class=\"fas fa-check\"></i>';
         parent.style.textDecoration = "line-through";
         parent.style.backgroundColor = "#8AF7B8";
+        list.items[index].done = true;
     }
+    download();
 }
 
 //Gets local storage data and converts it into lists
@@ -214,7 +276,7 @@ function upload(){
         for(let i = 0; i < newLists.length; i++){
             let list = new List(newLists[i].name);
             for(let j = 0; j < newLists[i].items.length; j++){
-                list.add(newLists[i].items[j]);
+                list.add(newLists[i].items[j].name, newLists[i].items[j].done);
             }
             lists.push(list);
             add(getListName(list.name));
@@ -228,6 +290,24 @@ function upload(){
 //Ideally saves all data on lists to the local storage
 function download(){
     localStorage.setItem("lists", JSON.stringify(lists))
+}
+
+//Finds a list and returns the index of it in array "lists"
+function getList(listName){
+    for(let i = 0; i < lists.length; i++){
+        if(lists[i].name === listName){
+            return i;
+        }
+    }
+}
+
+//Returns index of specific item in a given list
+function getItem(list, itemName){
+    for(let i = 0; i < list.items.length; i++){
+        if(list.items[i].name === itemName){
+            return i;
+        }
+    }
 }
 
 //Returns the name of a list without the 'list_' at the beginning
